@@ -73,12 +73,12 @@ class FileGenerator:
     
     def save_code(self, project_path: str, code: str, filename: str = "main.py") -> str:
         """
-        Save code to a file.
+        Save FastAPI backend API code to a file.
         
         Args:
             project_path: Path to the project folder
-            code: Code content
-            filename: Name of the code file (default: main.py)
+            code: Code content (FastAPI backend code)
+            filename: Name of the code file (default: main.py for FastAPI)
         
         Returns:
             Path to the saved code file
@@ -136,9 +136,11 @@ class FileGenerator:
 {requirements if requirements else "None specified"}
 
 ## Generated Files
-- `main.py`: Main application code
-- `tests/test_main.py`: Test cases
-- `ARCHITECTURE.md`: Software architecture document
+- `main.py`: FastAPI backend REST API
+- `frontend/`: React TypeScript frontend
+- `docs/api_route_plan.json`: API route plan
+- `database/schema.sql`: SQLite database schema
+- `ARCHITECTURE.md`: Architecture document
 
 ## Installation
 ```bash
@@ -146,9 +148,26 @@ pip install -r requirements.txt
 ```
 
 ## Running
+
+### Backend
 ```bash
-python main.py
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the FastAPI backend
+uvicorn main:app --reload
 ```
+
+The API will be available at `http://localhost:8000`
+API documentation will be available at `http://localhost:8000/docs`
+
+### Frontend
+```bash
+cd frontend
+npm install
+npm start
+```
+Frontend runs at `http://localhost:3000`
 
 ## Testing
 ```bash
@@ -172,18 +191,231 @@ pytest tests/
             Path to the saved requirements file
         """
         if not requirements_content:
-            requirements_content = "pytest>=7.0.0\n"
+            requirements_content = "fastapi>=0.104.0\nuvicorn[standard]>=0.24.0\npydantic>=2.5.0\npytest>=7.0.0\n"
         
         req_path = os.path.join(project_path, "requirements.txt")
         with open(req_path, 'w', encoding='utf-8') as f:
             f.write(requirements_content)
         return req_path
     
+    def save_database_schema(self, project_path: str, database_schema: str) -> str:
+        """
+        Save database schema to file.
+        
+        Args:
+            project_path: Path to the project folder
+            database_schema: SQL schema content
+        
+        Returns:
+            Path to the saved database schema file
+        """
+        # Create database directory
+        db_dir = os.path.join(project_path, "database")
+        Path(db_dir).mkdir(parents=True, exist_ok=True)
+        
+        # Extract SQL from the schema (in case it's in a code block)
+        sql_content = self._extract_sql_from_schema(database_schema)
+        
+        # Save SQL schema
+        sql_path = os.path.join(db_dir, "schema.sql")
+        with open(sql_path, 'w', encoding='utf-8') as f:
+            f.write(sql_content)
+        
+        return sql_path
+    
+    def _extract_sql_from_schema(self, content: str) -> str:
+        """
+        Extract SQL code from database schema content.
+        
+        Args:
+            content: Database schema content that may contain SQL code blocks
+        
+        Returns:
+            Extracted SQL code
+        """
+        # Check for SQL code blocks
+        sql_pattern = r'```sql\s*\n(.*?)```'
+        match = re.search(sql_pattern, content, re.DOTALL)
+        if match:
+            return match.group(1).strip()
+        
+        # Check for generic code blocks that might be SQL
+        code_pattern = r'```\s*\n(.*?CREATE.*?)\n```'
+        match = re.search(code_pattern, content, re.DOTALL | re.IGNORECASE)
+        if match:
+            return match.group(1).strip()
+        
+        # If no code blocks, return content as-is (might be plain SQL)
+        return content.strip()
+    
+    def _extract_python_from_schema(self, content: str) -> str:
+        """
+        Extract Python code from database schema content.
+        
+        Args:
+            content: Database schema content that may contain Python code blocks
+        
+        Returns:
+            Extracted Python code or empty string
+        """
+        # Check for Python code blocks
+        python_pattern = r'```python\s*\n(.*?)```'
+        match = re.search(python_pattern, content, re.DOTALL)
+        if match:
+            return match.group(1).strip()
+        
+        return ""
+    
+    def save_api_documentation(self, project_path: str, api_documentation: Dict[str, Any]) -> str:
+        """
+        Save API documentation to a JSON file.
+        
+        Args:
+            project_path: Path to the project folder
+            api_documentation: API documentation dictionary
+        
+        Returns:
+            Path to the saved API documentation file
+        """
+        import json
+        
+        # Create docs directory if it doesn't exist
+        docs_dir = os.path.join(project_path, "docs")
+        Path(docs_dir).mkdir(parents=True, exist_ok=True)
+        
+        # Save as JSON file
+        api_doc_path = os.path.join(docs_dir, "api_documentation.json")
+        with open(api_doc_path, 'w', encoding='utf-8') as f:
+            json.dump(api_documentation, f, indent=2, ensure_ascii=False)
+        
+        return api_doc_path
+    
+    def save_api_route_plan(self, project_path: str, api_route_plan: Dict[str, Any]) -> str:
+        """
+        Save API route plan to a JSON file.
+        
+        Args:
+            project_path: Path to the project folder
+            api_route_plan: API route plan dictionary
+        
+        Returns:
+            Path to the saved API route plan file
+        """
+        import json
+        
+        # Create docs directory if it doesn't exist
+        docs_dir = os.path.join(project_path, "docs")
+        Path(docs_dir).mkdir(parents=True, exist_ok=True)
+        
+        # Save as JSON file
+        route_plan_path = os.path.join(docs_dir, "api_route_plan.json")
+        with open(route_plan_path, 'w', encoding='utf-8') as f:
+            json.dump(api_route_plan, f, indent=2, ensure_ascii=False)
+        
+        return route_plan_path
+    
+    def save_frontend(self, project_path: str, frontend_code: str) -> Dict[str, str]:
+        """Save frontend code to files. Expects format: ```javascript:src/path/to/file.jsx\ncontent```"""
+        frontend_path = os.path.join(project_path, "frontend")
+        Path(frontend_path).mkdir(parents=True, exist_ok=True)
+        
+        files_saved = {}
+        import re
+        
+        # Pattern matches: ```javascript:src/path/to/file.jsx\ncontent```
+        # Also handles: ```jsx:path```, ```json:package.json```, etc.
+        # Pattern: language tag, colon, filepath, then content
+        # More specific: requires language tag and colon before filepath to avoid false matches
+        file_pattern = r'```(?:javascript|jsx|js|typescript|tsx|ts|json|css|html):([^\n]+)\n(.*?)```'
+        matches = re.findall(file_pattern, frontend_code, re.DOTALL)
+        
+        if matches:
+            for match in matches:
+                filepath = match[0].strip() if match[0] else None
+                content = match[1].strip()
+                
+                # Skip if no content
+                if not content or len(content) < 10:  # Minimum content length
+                    continue
+                
+                # If no filepath specified, use default
+                if not filepath:
+                    filepath = "src/App.jsx"
+                
+                # Clean filepath - preserve public/ and src/ directories
+                filepath = filepath.lstrip('/').replace('frontend/', '').strip()
+                
+                # Validate filepath - must have valid extension or be a known config file
+                valid_extensions = ['.jsx', '.js', '.json', '.html', '.css', '.tsx', '.ts']
+                has_valid_extension = any(filepath.endswith(ext) for ext in valid_extensions)
+                is_known_config = filepath in ['package.json', 'tsconfig.json']
+                
+                # Skip if filepath is invalid
+                # Must have valid extension OR be a known config file
+                # Must not be a common word
+                # Must be at least 5 chars (to avoid "on", "off", etc.)
+                common_words = ['on', 'off', 'in', 'at', 'to', 'as', 'if', 'of', 'is', 'it', 'we', 'do', 'go', 'no']
+                if not (has_valid_extension or is_known_config):
+                    continue
+                if len(filepath) < 5 and filepath not in ['package.json', 'tsconfig.json']:
+                    continue
+                if filepath.lower() in common_words:
+                    continue
+                
+                # Handle root level files (package.json, tsconfig.json)
+                if filepath in ['package.json', 'tsconfig.json']:
+                    # Keep at root level
+                    pass
+                # Don't modify paths that already start with public/ or src/
+                elif not filepath.startswith('public/') and not filepath.startswith('src/'):
+                    # Root level files (like package.json) stay at root
+                    if '/' not in filepath and filepath.endswith('.json'):
+                        # Root level config files
+                        pass
+                    elif '/' not in filepath:
+                        # Single filename without path, default to src/
+                        filepath = f"src/{filepath}"
+                    else:
+                        # Has path but doesn't start with public/ or src/, add src/
+                        filepath = f"src/{filepath}"
+                
+                # Create full path
+                full_path = os.path.join(frontend_path, filepath)
+                file_dir = os.path.dirname(full_path)
+                
+                # Create directory structure
+                if file_dir:
+                    Path(file_dir).mkdir(parents=True, exist_ok=True)
+                
+                # Save file
+                with open(full_path, 'w', encoding='utf-8') as f:
+                    f.write(content)
+                
+                # Store relative path for reference
+                relative_path = filepath
+                files_saved[relative_path] = full_path
+        else:
+            # Fallback: save as single App.jsx
+            content = self._extract_code_from_markdown(frontend_code)
+            src_dir = os.path.join(frontend_path, "src")
+            Path(src_dir).mkdir(parents=True, exist_ok=True)
+            app_path = os.path.join(src_dir, "App.jsx")
+            with open(app_path, 'w', encoding='utf-8') as f:
+                f.write(content)
+            files_saved["src/App.jsx"] = app_path
+        
+        return files_saved
+    
     def generate_project(
         self,
         architecture: str,
+        database_schema: str,
         code: str,
-        tests: str,
+        api_route_plan: Dict[str, Any] = None,
+        api_documentation: Dict[str, Any] = None,
+        requirements_txt: Optional[str] = None,
+        frontend_code: str = "",
+        tests: str = "",
         description: str = "",
         requirements: str = "",
         project_name: Optional[str] = None
@@ -193,7 +425,12 @@ pytest tests/
         
         Args:
             architecture: Architecture document
-            code: Generated code
+            database_schema: Database schema and setup code
+            code: Generated backend code
+            api_route_plan: API route plan dictionary
+            api_documentation: API documentation dictionary
+            requirements_txt: Generated requirements.txt content
+            frontend_code: Generated frontend code
             tests: Generated test cases
             description: Project description
             requirements: Project requirements
@@ -209,11 +446,29 @@ pytest tests/
         files = {
             "project_path": project_path,
             "architecture_file": self.save_architecture(project_path, architecture),
+            "database_schema_file": self.save_database_schema(project_path, database_schema),
             "code_file": self.save_code(project_path, code),
-            "test_file": self.save_tests(project_path, tests),
             "readme_file": self.save_readme(project_path, description, requirements),
-            "requirements_file": self.save_requirements(project_path)
+            "requirements_file": self.save_requirements(project_path, requirements_txt)
         }
+        
+        # Save API route plan if provided
+        if api_route_plan:
+            files["api_route_plan_file"] = self.save_api_route_plan(project_path, api_route_plan)
+        
+        # Save API documentation if provided
+        if api_documentation:
+            files["api_documentation_file"] = self.save_api_documentation(project_path, api_documentation)
+        
+        # Save frontend if provided
+        if frontend_code:
+            frontend_files = self.save_frontend(project_path, frontend_code)
+            files["frontend_files"] = frontend_files
+            files["frontend_path"] = os.path.join(project_path, "frontend")
+        
+        # Save tests if provided
+        if tests:
+            files["test_file"] = self.save_tests(project_path, tests)
         
         return files
     

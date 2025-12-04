@@ -27,11 +27,14 @@ class SoftwareRequest(BaseModel):
 class SoftwareResponse(BaseModel):
     """Response model for software generation."""
     architecture: str
+    database_schema: str
+    api_route_plan: Optional[Dict[str, Any]] = None
     code: str
+    frontend_code: str
     tests: str
     success: bool = True
     message: Optional[str] = None
-    files: Optional[Dict[str, str]] = None  # Paths to generated files
+    files: Optional[Dict[str, Any]] = None  # Paths to generated files
 
 
 class UsageStatsResponse(BaseModel):
@@ -61,7 +64,11 @@ async def generate_software(request: SoftwareRequest):
         })
         
         architecture = result.get("architecture", "")
+        database_schema = result.get("database_schema", "")
+        api_route_plan = result.get("api_route_plan", {})
         code = result.get("code", "")
+        requirements_txt = result.get("requirements_txt", "")
+        frontend_code = result.get("frontend_code", "")
         tests = result.get("tests", "")
         
         # Save files if requested
@@ -70,7 +77,11 @@ async def generate_software(request: SoftwareRequest):
             try:
                 file_info = file_generator.generate_project(
                     architecture=architecture,
+                    database_schema=database_schema,
                     code=code,
+                    api_route_plan=api_route_plan if api_route_plan else None,
+                    requirements_txt=requirements_txt if requirements_txt else None,
+                    frontend_code=frontend_code,
                     tests=tests,
                     description=request.description,
                     requirements=request.requirements or "",
@@ -79,18 +90,34 @@ async def generate_software(request: SoftwareRequest):
                 files = {
                     "project_path": file_info["project_path"],
                     "architecture_file": file_info["architecture_file"],
+                    "database_schema_file": file_info["database_schema_file"],
                     "code_file": file_info["code_file"],
-                    "test_file": file_info["test_file"],
                     "readme_file": file_info["readme_file"],
                     "requirements_file": file_info["requirements_file"]
                 }
+                
+                # Add API route plan file if generated
+                if "api_route_plan_file" in file_info:
+                    files["api_route_plan_file"] = file_info["api_route_plan_file"]
+                
+                # Add frontend files if generated
+                if "frontend_files" in file_info:
+                    files["frontend_path"] = file_info["frontend_path"]
+                    files["frontend_files"] = file_info["frontend_files"]
+                
+                # Add test file if generated
+                if "test_file" in file_info:
+                    files["test_file"] = file_info["test_file"]
             except Exception as file_error:
                 # Log error but don't fail the request
                 print(f"Warning: Failed to save files: {str(file_error)}")
         
         return SoftwareResponse(
             architecture=architecture,
+            database_schema=database_schema,
+            api_route_plan=api_route_plan if api_route_plan else None,
             code=code,
+            frontend_code=frontend_code,
             tests=tests,
             success=True,
             files=files

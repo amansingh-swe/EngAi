@@ -1,0 +1,189 @@
+{
+  "base_url": "http://localhost:8080/api",
+  "routes": [
+    {
+      "method": "POST",
+      "path": "/users/register",
+      "body_schema": {
+        "username": "string",
+        "password": "string",
+        "email": "string"
+      },
+      "query_params": null,
+      "path_params": null,
+      "response_schema": {
+        "user_id": "string",
+        "username": "string",
+        "email": "string"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/users/login",
+      "body_schema": {
+        "username": "string",
+        "password": "string"
+      },
+      "query_params": null,
+      "path_params": null,
+      "response_schema": {
+        "token": "string"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/users/{user_id}",
+      "body_schema": null,
+      "query_params": null,
+      "path_params": {
+        "user_id": "string"
+      },
+      "response_schema": {
+        "user_id": "string",
+        "username": "string",
+        "email": "string",
+        "is_online": "boolean"
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/users/{user_id}",
+      "body_schema": {
+        "username": "string (optional)",
+        "email": "string (optional)"
+      },
+      "query_params": null,
+      "path_params": {
+        "user_id": "string"
+      },
+      "response_schema": {
+        "user_id": "string",
+        "username": "string",
+        "email": "string"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/groups",
+      "body_schema": {
+        "name": "string",
+        "description": "string (optional)"
+      },
+      "query_params": null,
+      "path_params": null,
+      "response_schema": {
+        "group_id": "string",
+        "name": "string",
+        "creator_id": "string"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/groups",
+      "body_schema": null,
+      "query_params": {
+        "user_id": "string"
+      },
+      "path_params": null,
+      "response_schema": [
+        {
+          "group_id": "string",
+          "name": "string"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/groups/{group_id}",
+      "body_schema": null,
+      "query_params": null,
+      "path_params": {
+        "group_id": "string"
+      },
+      "response_schema": {
+        "group_id": "string",
+        "name": "string",
+        "description": "string",
+        "members": [
+          "string"
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/groups/{group_id}/join",
+      "body_schema": null,
+      "query_params": null,
+      "path_params": {
+        "group_id": "string"
+      },
+      "response_schema": {
+        "message": "string"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/groups/{group_id}/leave",
+      "body_schema": null,
+      "query_params": null,
+      "path_params": {
+        "group_id": "string"
+      },
+      "response_schema": {
+        "message": "string"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/messages",
+      "body_schema": {
+        "group_id": "string",
+        "sender_id": "string",
+        "content": "string",
+        "media_url": "string (optional)"
+      },
+      "query_params": null,
+      "path_params": null,
+      "response_schema": {
+        "message_id": "string",
+        "group_id": "string",
+        "sender_id": "string",
+        "content": "string",
+        "timestamp": "datetime",
+        "media_url": "string (optional)"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/messages/{group_id}",
+      "body_schema": null,
+      "query_params": {
+        "limit": "integer (optional)",
+        "before": "string (optional, message_id)"
+      },
+      "path_params": {
+        "group_id": "string"
+      },
+      "response_schema": [
+        {
+          "message_id": "string",
+          "group_id": "string",
+          "sender_id": "string",
+          "content": "string",
+          "timestamp": "datetime",
+          "media_url": "string (optional)"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/upload",
+      "body_schema": null,
+      "query_params": null,
+      "path_params": null,
+      "response_schema": {
+        "media_url": "string"
+      }
+    }
+  ]
+}

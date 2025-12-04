@@ -35,6 +35,7 @@ class UsageTracker:
         """Initialize the usage tracker with database connection."""
         database_url = os.getenv("DATABASE_URL", "sqlite:///./usage_tracking.db")
         self.engine = create_engine(database_url, connect_args={"check_same_thread": False})
+        Base.metadata.drop_all(bind=self.engine)
         Base.metadata.create_all(bind=self.engine)
         self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
     

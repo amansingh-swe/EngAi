@@ -165,14 +165,10 @@ Requirements:
 
 Please provide:
 1. A high-level architecture overview
-2. Key components and their responsibilities
-3. Data flow between components
-4. Technology stack recommendations
-5. File structure and organization
 
-Be specific and detailed. Format your response as a structured architecture document."""
+Format your response as a structured architecture document."""
 
-    CODE_GENERATOR_TEMPLATE = """You are an expert Python developer. Based on the following architecture, generate complete, executable Python code.
+    API_ROUTE_PLANNER_TEMPLATE = """Based on the architecture below, generate a concise API route plan with only the information needed to implement the endpoints.
 
 Architecture:
 {architecture}
@@ -180,14 +176,166 @@ Architecture:
 Requirements:
 {requirements}
 
-Please generate:
-1. Complete, runnable Python code
-2. All necessary imports
-3. Proper error handling
-4. Clear comments and documentation
-5. Follow Python best practices (PEP 8)
+Output JSON with routes containing:
+- method: HTTP method (GET, POST, PUT, PATCH, DELETE)
+- path: Endpoint path
+- body_schema: Request body fields and types (for POST/PUT/PATCH, null for GET/DELETE)
+- query_params: Query parameters as {{"param": "type"}} (null if none)
+- path_params: Path parameters as {{"param": "type"}} (null if none)
+- response_schema: Response data structure
 
-Generate only the code, no explanations unless necessary."""
+```json
+{{
+  "api_route_plan": {{
+    "base_url": "http://localhost:8000/api",
+    "routes": [
+      {{
+        "method": "GET",
+        "path": "/items",
+        "body_schema": null,
+        "query_params": {{"page": "integer", "limit": "integer"}},
+        "path_params": null,
+        "response_schema": [{{"id": "integer", "name": "string"}}]
+      }},
+      {{
+        "method": "POST",
+        "path": "/items",
+        "body_schema": {{"name": "string", "description": "string"}},
+        "query_params": null,
+        "path_params": null,
+        "response_schema": {{"id": "integer", "name": "string", "description": "string"}}
+      }},
+      {{
+        "method": "GET",
+        "path": "/items/{{id}}",
+        "body_schema": null,
+        "query_params": null,
+        "path_params": {{"id": "integer"}},
+        "response_schema": {{"id": "integer", "name": "string", "description": "string"}}
+      }}
+    ]
+  }}
+}}
+```
+
+Include all CRUD operations needed. Keep it minimal - only what's needed to generate the code."""
+
+    DATABASE_TEMPLATE = """You are an expert database designer. Based on the following architecture and requirements, create a SQLite database schema.
+
+Architecture:
+{architecture}
+
+Requirements:
+{requirements}
+
+Please generate SQL CREATE TABLE statements for SQLite with:
+1. All necessary tables with appropriate columns, data types, and constraints
+2. Primary keys and foreign keys where applicable
+3. Indexes for performance if needed
+4. NOT NULL constraints where appropriate
+
+Format your response as SQL schema in a code block:
+
+```sql
+CREATE TABLE IF NOT EXISTS table_name (
+    column1 TYPE CONSTRAINT,
+    column2 TYPE CONSTRAINT,
+    ...
+    PRIMARY KEY (column1),
+    FOREIGN KEY (column2) REFERENCES other_table(id)
+);
+```
+
+Be specific and create a complete, working SQL schema. Only output the SQL schema, no other code or explanations."""
+
+    CODE_GENERATOR_TEMPLATE = """You are an expert Python developer specializing in FastAPI. Based on the following API route plan and database schema, generate a complete FastAPI backend REST API with SQLite database integration.
+
+API Route Plan:
+{api_route_plan}
+
+Database Schema:
+{database_schema}
+
+Requirements:
+{requirements}
+
+Please generate a complete FastAPI backend API with:
+1. FastAPI application setup with proper imports (fastapi, uvicorn, pydantic, sqlite3)
+2. Database connection and initialization using the provided SQLite schema and initialization code
+3. Pydantic models for request/response validation based on the database tables
+4. REST API endpoints based on the requirements:
+   - GET endpoints for retrieving data
+   - POST endpoints for creating data
+   - PUT/PATCH endpoints for updating data (if needed)
+   - DELETE endpoints for deleting data (if needed)
+5. Proper error handling with HTTPException
+6. Database CRUD operations using SQLite
+7. CORS middleware configuration
+8. Clear comments and documentation
+9. Follow Python best practices (PEP 8)
+10. Use the provided API route plan to implement all specified endpoints
+11. Use the provided database schema to create appropriate endpoints
+
+Structure the code as a single FastAPI application file that can be run with: uvicorn main:app --reload
+
+IMPORTANT: After the code, also provide a requirements.txt file with all necessary Python dependencies. Format it as:
+
+```txt:requirements.txt
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.5.0
+# Add all other dependencies used in the code (e.g., bcrypt, jwt, python-multipart, etc.)
+```
+
+Include all packages imported in the code (fastapi, uvicorn, pydantic, sqlite3 is built-in, but add any other third-party packages like bcrypt, python-jose, python-multipart, etc.)
+"""
+
+    FRONTEND_GENERATOR_TEMPLATE = """Generate React JavaScript frontend for these API routes:
+
+{api_route_plan}
+
+Requirements: {requirements}
+
+Create:
+- Components for each route
+- API service (fetch)
+- Forms (POST/PUT/PATCH)
+- Lists (GET)
+- Delete (DELETE)
+
+Output Format:
+For each file, use this format:
+```javascript:src/path/to/file.jsx
+// file content here
+```
+
+Required files (MUST include all):
+1. ```html:public/index.html
+   // Main HTML file with root div
+   ```
+
+2. ```javascript:src/index.jsx
+   // Entry point that renders App component
+   ```
+
+3. ```javascript:src/App.jsx
+   // Main app component
+   ```
+
+4. ```javascript:src/services/api.js
+   // API service with fetch functions
+   ```
+
+5. ```javascript:src/components/[ComponentName].jsx
+   // Individual components (one per route)
+   ```
+
+6. ```json:package.json
+   // Dependencies: react, react-dom, react-scripts
+   // Scripts: start, build, test, eject
+   ```
+
+Generate all files in the format above. Each file must be in a separate code block with the file path. Use JavaScript (.jsx, .js), not TypeScript. The public/index.html and src/index.jsx are REQUIRED for the app to run."""
 
     TEST_GENERATOR_TEMPLATE = """You are an expert in software testing. Based on the following code, generate comprehensive test cases.
 

@@ -15,12 +15,14 @@ The system uses a multi-agent architecture where specialized agents collaborate 
 
 ### Multi-Agent System
 
-The system consists of four specialized agents:
+The system consists of six specialized agents:
 
 1. **Orchestrator Agent**: Coordinates the entire generation process
 2. **Architect Agent**: Analyzes requirements and creates software architecture
-3. **Code Generator Agent**: Generates executable code based on architecture
-4. **Test Generator Agent**: Creates comprehensive test cases for the generated code
+3. **Database Agent**: Creates SQLite database schema and setup code
+4. **Backend Code Generator Agent**: Generates FastAPI REST API backend code with database integration based on architecture and schema
+5. **Frontend Generator Agent**: Generates React frontend application that consumes the backend API
+6. **Test Generator Agent**: Creates comprehensive test cases for the generated code
 
 ### Technology Stack
 
@@ -210,12 +212,15 @@ Generate software from description and requirements.
 ```json
 {
   "architecture": "Architecture document",
-  "code": "Generated Python code",
+  "database_schema": "SQLite database schema and setup code",
+  "code": "Generated FastAPI backend REST API code with database integration",
+  "frontend_code": "Generated React frontend application code",
   "tests": "Generated test cases",
   "success": true,
   "files": {
     "project_path": "./generated_projects/my-project_20240101_120000",
     "architecture_file": "./generated_projects/my-project_20240101_120000/ARCHITECTURE.md",
+    "database_schema_file": "./generated_projects/my-project_20240101_120000/database/schema.sql",
     "code_file": "./generated_projects/my-project_20240101_120000/main.py",
     "test_file": "./generated_projects/my-project_20240101_120000/tests/test_main.py",
     "readme_file": "./generated_projects/my-project_20240101_120000/README.md",
@@ -264,11 +269,13 @@ Health check endpoint.
 1. **User Input**: User provides software description and requirements through the web UI
 2. **Orchestration**: Orchestrator agent receives the request
 3. **Architecture Generation**: Orchestrator calls Architect agent via MCP to create software architecture
-4. **Code Generation**: Orchestrator calls Code Generator agent via MCP to generate executable code
-5. **Test Generation**: Orchestrator calls Test Generator agent via MCP to create test cases
-6. **File Generation**: Generated code and tests are saved to files in the output directory (if `save_files` is true)
-7. **Usage Tracking**: All LLM API calls are tracked and stored in SQLite database
-8. **Response**: Complete software (architecture, code, tests) is returned to the user with file paths
+4. **Database Schema Generation**: Orchestrator calls Database agent via MCP to create SQLite database schema
+5. **Backend API Generation**: Orchestrator calls Backend Code Generator agent via MCP to generate FastAPI REST API with database integration
+6. **Frontend Generation**: Orchestrator calls Frontend Generator agent via MCP to generate React frontend that consumes the backend API
+7. **Test Generation**: Orchestrator calls Test Generator agent via MCP to create test cases
+8. **File Generation**: Generated code, frontend, database schema, and tests are saved to files in the output directory (if `save_files` is true)
+9. **Usage Tracking**: All LLM API calls are tracked and stored in SQLite database
+10. **Response**: Complete software (architecture, database schema, backend API, frontend, tests) is returned to the user with file paths
 
 ## File Generation
 
@@ -277,10 +284,20 @@ The system automatically generates a complete project structure when `save_files
 ```
 generated_projects/
 └── project-name_20240101_120000/
-    ├── main.py                 # Generated application code
+    ├── main.py                 # FastAPI backend REST API with SQLite integration
     ├── ARCHITECTURE.md         # Architecture document
     ├── README.md              # Project README
-    ├── requirements.txt        # Python dependencies
+    ├── requirements.txt        # Python dependencies (includes fastapi, uvicorn)
+    ├── frontend/               # React frontend application
+    │   ├── src/
+    │   │   ├── App.tsx        # Main application component
+    │   │   ├── components/    # React components
+    │   │   ├── services/       # API client services
+    │   │   └── types/         # TypeScript type definitions
+    │   └── package.json       # Frontend dependencies
+    ├── database/
+    │   ├── schema.sql         # SQLite database schema
+    │   └── init_db.py         # Database initialization script
     └── tests/
         └── test_main.py       # Generated test cases
 ```
