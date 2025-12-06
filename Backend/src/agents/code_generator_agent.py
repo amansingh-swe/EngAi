@@ -17,14 +17,14 @@ class CodeGeneratorAgent(BaseAgent):
         # Register tools this agent can provide
         self.mcp_client.register_tool("generate_code", self.generate_code)
     
-    def generate_code(self, api_route_plan: Dict[str, Any], database_schema: str, requirements: str) -> Dict[str, Any]:
+    def generate_code(self, api_route_plan: Dict[str, Any], database_schema: str, requirements: str = "") -> Dict[str, Any]:
         """
-        Generate FastAPI backend API code from API route plan, database schema, and requirements.
+        Generate FastAPI backend API code from API route plan and database schema.
         
         Args:
             api_route_plan: API route plan from route planner agent
             database_schema: SQL schema string
-            requirements: Software requirements
+            requirements: Software requirements (optional, not used in prompt)
         
         Returns:
             Dictionary with 'code' and 'requirements_txt'
@@ -54,8 +54,7 @@ class CodeGeneratorAgent(BaseAgent):
         
         prompt = PromptTemplates.CODE_GENERATOR_TEMPLATE.format(
             api_route_plan=api_route_plan_str,
-            database_schema=database_schema,
-            requirements=requirements
+            database_schema=database_schema
         )
         
         output = self._call_llm(

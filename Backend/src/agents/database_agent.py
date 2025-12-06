@@ -16,13 +16,13 @@ class DatabaseAgent(BaseAgent):
         # Register tools this agent can provide
         self.mcp_client.register_tool("create_database_schema", self.create_database_schema)
     
-    def create_database_schema(self, architecture: str, requirements: str) -> Dict[str, Any]:
+    def create_database_schema(self, architecture: str, requirements: str = "") -> Dict[str, Any]:
         """
-        Create database schema from architecture and requirements.
+        Create database schema from architecture.
         
         Args:
             architecture: Software architecture
-            requirements: Software requirements
+            requirements: Software requirements (optional, not used in prompt)
         
         Returns:
             Dictionary with 'database_schema' (SQL schema string)
@@ -68,11 +68,9 @@ class DatabaseAgent(BaseAgent):
             Dictionary with 'database_schema' (SQL schema string)
         """
         architecture = input_data.get("architecture", "")
-        requirements = input_data.get("requirements", "")
         
         prompt = PromptTemplates.DATABASE_TEMPLATE.format(
-            architecture=architecture,
-            requirements=requirements
+            architecture=architecture
         )
         
         database_schema_raw = self._call_llm(

@@ -23,7 +23,7 @@ class APIRoutePlannerAgent(BaseAgent):
         
         Args:
             architecture: Software architecture
-            requirements: Software requirements (optional)
+            requirements: Software requirements (optional, not used in prompt)
         
         Returns:
             Dictionary with 'api_route_plan' key
@@ -116,11 +116,9 @@ class APIRoutePlannerAgent(BaseAgent):
             Dictionary with 'api_route_plan' key
         """
         architecture = input_data.get("architecture", "")
-        requirements = input_data.get("requirements", "")
         
         prompt = PromptTemplates.API_ROUTE_PLANNER_TEMPLATE.format(
-            architecture=architecture,
-            requirements=requirements
+            architecture=architecture
         )
         
         output = self._call_llm(

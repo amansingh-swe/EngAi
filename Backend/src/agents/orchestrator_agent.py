@@ -84,23 +84,24 @@ class OrchestratorAgent(BaseAgent):
         requirements_txt = code_result.get("requirements_txt", "") if isinstance(code_result, dict) else ""
         
         # Step 5: Generate frontend code using frontend generator agent via MCP
-        # Pass API route plan instead of API documentation
+        # Pass API route plan and application description
         frontend_result = self.mcp_client.call_agent(
             target_agent="frontend_generator",
             tool="generate_frontend",
             api_route_plan=api_route_plan,
+            application_description=description,
             requirements=requirements
         )
         frontend_code = frontend_result if isinstance(frontend_result, str) else frontend_result.get("frontend_code", "")
         
         # Step 6: Generate tests using test generator agent via MCP
-        # test_result = self.mcp_client.call_agent(
-        #     target_agent="test_generator",
-        #     tool="generate_tests",
-        #     code=code,
-        #     requirements=requirements
-        # )
-        # tests = test_result if isinstance(test_result, str) else test_result.get("tests", "")
+        test_result = self.mcp_client.call_agent(
+            target_agent="test_generator",
+            tool="generate_tests",
+            code=code,
+            requirements=requirements
+        )
+        tests = test_result if isinstance(test_result, str) else test_result.get("tests", "")
         
         return {
             "architecture": architecture,
@@ -109,7 +110,7 @@ class OrchestratorAgent(BaseAgent):
             "code": code,
             "requirements_txt": requirements_txt,
             "frontend_code": frontend_code,
-            # "tests": tests,
+            "tests": tests,
             "agent": self.name
         }
 

@@ -1,0 +1,558 @@
+/* CSS Variables for Color Scheme */
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  --accent-color: #28a745;
+  --background-color: #f8f9fa;
+  --card-background: #ffffff;
+  --text-color: #333;
+  --border-color: #dee2e6;
+  --error-color: #dc3545;
+  --success-color: #28a745;
+  --hover-color: #0056b3;
+  --focus-outline-color: rgba(0, 123, 255, 0.5);
+}
+
+/* Global Styles */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 1.5rem;
+  color: var(--secondary-color);
+}
+
+/* Navigation Bar */
+.navbar {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-decoration: none;
+  color: white;
+}
+
+.navbar-logo {
+  text-decoration: none;
+  color: white;
+  transition: color 0.3s ease;
+}
+
+.navbar-logo:hover {
+  color: var(--hover-color);
+}
+
+.navbar-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-links li {
+  margin-left: 1.5rem;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: var(--hover-color);
+}
+
+.logout-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: var(--hover-color);
+}
+
+/* Main Content Area */
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Forms */
+.form-container {
+  background-color: var(--card-background);
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  margin: 2rem auto;
+}
+
+.form-title {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--primary-color);
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus-outline-color);
+}
+
+.form-button {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.form-button:hover {
+  background-color: var(--hover-color);
+  transform: translateY(-2px);
+}
+
+.form-button:active {
+  transform: translateY(0);
+}
+
+.form-button.secondary {
+  background-color: var(--secondary-color);
+}
+
+.form-button.secondary:hover {
+  background-color: #5a6268;
+}
+
+.form-button.danger {
+  background-color: var(--error-color);
+}
+
+.form-button.danger:hover {
+  background-color: #c82333;
+}
+
+.error-message {
+  color: var(--error-color);
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.success-message {
+  color: var(--success-color);
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+/* Loading State */
+.loading-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  color: var(--secondary-color);
+}
+
+/* Cards and Lists */
+.card {
+  background-color: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 0.75rem;
+  color: var(--primary-color);
+}
+
+.card-text {
+  margin-bottom: 0.5rem;
+}
+
+.card-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.list-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.list-item {
+  background-color: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.list-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.list-item-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: var(--primary-color);
+}
+
+.list-item-description {
+  font-size: 0.95rem;
+  color: var(--secondary-color);
+  margin-bottom: 0.75rem;
+}
+
+.list-item-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.list-item-link {
+  text-decoration: none;
+  color: var(--primary-color);
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.list-item-link:hover {
+  color: var(--hover-color);
+}
+
+/* Specific Component Styles */
+
+/* User Profile */
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  max-width: 600px;
+  margin: 2rem auto;
+  background-color: var(--card-background);
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.profile-field {
+  width: 100%;
+  text-align: center;
+}
+
+.profile-field-label {
+  font-weight: bold;
+  color: var(--secondary-color);
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.profile-field-value {
+  font-size: 1.1rem;
+  color: var(--text-color);
+}
+
+.profile-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* Group Details */
+.group-details-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  background-color: var(--card-background);
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.group-details-title {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.group-details-description {
+  color: var(--secondary-color);
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-style: italic;
+}
+
+.group-details-members-list,
+.group-details-messages-list {
+  margin-top: 1.5rem;
+}
+
+.group-details-members-list h3,
+.group-details-messages-list h3 {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.group-member-item,
+.group-message-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.group-member-item:last-child,
+.group-message-item:last-child {
+  border-bottom: none;
+}
+
+.group-member-name {
+  font-weight: bold;
+}
+
+.group-message-content {
+  flex-grow: 1;
+  margin-right: 1rem;
+}
+
+.group-message-timestamp {
+  font-size: 0.8rem;
+  color: var(--secondary-color);
+  white-space: nowrap;
+}
+
+.group-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  justify-content: center;
+}
+
+.group-actions .form-button {
+  width: auto;
+}
+
+/* Message History */
+.message-history-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  background-color: var(--card-background);
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.message-history-title {
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.message-list {
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 10px; /* For scrollbar */
+  margin-bottom: 1.5rem;
+}
+
+.message-item {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border-radius: 6px;
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color);
+}
+
+.message-item.own {
+  align-self: flex-end;
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.message-sender {
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+  color: var(--secondary-color);
+}
+
+.message-item.own .message-sender {
+  color: white;
+}
+
+.message-content {
+  margin-bottom: 0.5rem;
+  word-wrap: break-word;
+}
+
+.message-media img {
+  max-width: 200px;
+  height: auto;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+}
+
+.message-timestamp {
+  font-size: 0.75rem;
+  color: var(--secondary-color);
+  align-self: flex-end;
+}
+
+.message-item.own .message-timestamp {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Media Upload */
+.media-upload-container {
+  max-width: 500px;
+  margin: 2rem auto;
+  background-color: var(--card-background);
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.media-upload-preview {
+  margin-top: 1rem;
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+/* Responsive Design Basics */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    padding: 1rem;
+  }
+  .navbar-links {
+    margin-top: 1rem;
+    flex-direction: column;
+    align-items: center;
+  }
+  .navbar-links li {
+    margin-left: 0;
+    margin-bottom: 0.5rem;
+  }
+  .main-content {
+    padding: 1rem;
+  }
+  .form-container,
+  .profile-container,
+  .group-details-container,
+  .message-history-container,
+  .media-upload-container {
+    margin: 1rem auto;
+    padding: 1.5rem;
+  }
+  .list-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-input,
+  .form-textarea,
+  .form-select,
+  .form-button {
+    font-size: 0.9rem;
+    padding: 0.6rem;
+  }
+  .navbar-brand {
+    font-size: 1.2rem;
+  }
+  .nav-link, .logout-button {
+    padding: 0.4rem 0.8rem;
+  }
+}

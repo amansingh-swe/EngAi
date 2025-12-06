@@ -15,13 +15,13 @@ class TestGeneratorAgent(BaseAgent):
         # Register tools this agent can provide
         self.mcp_client.register_tool("generate_tests", self.generate_tests)
     
-    def generate_tests(self, code: str, requirements: str) -> str:
+    def generate_tests(self, code: str, requirements: str = "") -> str:
         """
-        Generate tests from code and requirements.
+        Generate tests from code.
         
         Args:
             code: Generated code
-            requirements: Software requirements
+            requirements: Software requirements (optional, not used in prompt)
         
         Returns:
             Generated test code
@@ -42,11 +42,9 @@ class TestGeneratorAgent(BaseAgent):
             Dictionary with 'tests' key
         """
         code = input_data.get("code", "")
-        requirements = input_data.get("requirements", "")
         
         prompt = PromptTemplates.TEST_GENERATOR_TEMPLATE.format(
-            code=code,
-            requirements=requirements
+            code=code
         )
         
         tests = self._call_llm(

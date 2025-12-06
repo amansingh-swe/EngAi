@@ -155,206 +155,131 @@ class GeminiService:
 class PromptTemplates:
     """Prompt templates for different agent roles."""
     
-    ARCHITECT_TEMPLATE = """You are an expert software architect. Your task is to analyze the following software description and requirements, then create a detailed software architecture.
+    ARCHITECT_TEMPLATE = """Create a high-level software architecture document.
 
-Software Description:
-{description}
+Description: {description}
+Requirements: {requirements}
 
-Requirements:
-{requirements}
+Output a structured architecture document covering:
+- System components and their relationships
+- Technology stack recommendations
+- Data flow and interactions"""
 
-Please provide:
-1. A high-level architecture overview
+    API_ROUTE_PLANNER_TEMPLATE = """Generate API route plan JSON from the architecture.
 
-Format your response as a structured architecture document."""
+Architecture: {architecture}
 
-    API_ROUTE_PLANNER_TEMPLATE = """Based on the architecture below, generate a concise API route plan with only the information needed to implement the endpoints.
-
-Architecture:
-{architecture}
-
-Requirements:
-{requirements}
-
-Output JSON with routes containing:
-- method: HTTP method (GET, POST, PUT, PATCH, DELETE)
-- path: Endpoint path
-- body_schema: Request body fields and types (for POST/PUT/PATCH, null for GET/DELETE)
-- query_params: Query parameters as {{"param": "type"}} (null if none)
-- path_params: Path parameters as {{"param": "type"}} (null if none)
-- response_schema: Response data structure
-
+Output JSON format:
 ```json
 {{
   "api_route_plan": {{
     "base_url": "http://localhost:8000/api",
     "routes": [
       {{
-        "method": "GET",
-        "path": "/items",
-        "body_schema": null,
-        "query_params": {{"page": "integer", "limit": "integer"}},
-        "path_params": null,
-        "response_schema": [{{"id": "integer", "name": "string"}}]
-      }},
-      {{
-        "method": "POST",
-        "path": "/items",
-        "body_schema": {{"name": "string", "description": "string"}},
-        "query_params": null,
-        "path_params": null,
-        "response_schema": {{"id": "integer", "name": "string", "description": "string"}}
-      }},
-      {{
-        "method": "GET",
-        "path": "/items/{{id}}",
-        "body_schema": null,
-        "query_params": null,
-        "path_params": {{"id": "integer"}},
-        "response_schema": {{"id": "integer", "name": "string", "description": "string"}}
+        "method": "GET|POST|PUT|PATCH|DELETE",
+        "path": "/resource",
+        "body_schema": {{"field": "type"}} or null,
+        "query_params": {{"param": "type"}} or null,
+        "path_params": {{"param": "type"}} or null,
+        "response_schema": {{"field": "type"}}
       }}
     ]
   }}
 }}
 ```
 
-Include all CRUD operations needed. Keep it minimal - only what's needed to generate the code."""
+Include all CRUD endpoints needed. Output only JSON."""
 
-    DATABASE_TEMPLATE = """You are an expert database designer. Based on the following architecture and requirements, create a SQLite database schema.
+    DATABASE_TEMPLATE = """Generate SQLite database schema from the architecture.
 
-Architecture:
-{architecture}
+Architecture: {architecture}
 
-Requirements:
-{requirements}
-
-Please generate SQL CREATE TABLE statements for SQLite with:
-1. All necessary tables with appropriate columns, data types, and constraints
-2. Primary keys and foreign keys where applicable
-3. Indexes for performance if needed
-4. NOT NULL constraints where appropriate
-
-Format your response as SQL schema in a code block:
-
+Output SQL CREATE TABLE statements:
 ```sql
 CREATE TABLE IF NOT EXISTS table_name (
-    column1 TYPE CONSTRAINT,
-    column2 TYPE CONSTRAINT,
-    ...
-    PRIMARY KEY (column1),
-    FOREIGN KEY (column2) REFERENCES other_table(id)
+    id INTEGER PRIMARY KEY,
+    column_name TYPE NOT NULL,
+    FOREIGN KEY (column) REFERENCES other_table(id)
 );
 ```
 
-Be specific and create a complete, working SQL schema. Only output the SQL schema, no other code or explanations."""
+Include all tables, primary keys, foreign keys, and NOT NULL constraints. Output only SQL."""
 
-    CODE_GENERATOR_TEMPLATE = """You are an expert Python developer specializing in FastAPI. Based on the following API route plan and database schema, generate a complete FastAPI backend REST API with SQLite database integration.
+    CODE_GENERATOR_TEMPLATE = """Generate FastAPI backend code implementing the API routes with SQLite.
 
-API Route Plan:
-{api_route_plan}
+API Routes: {api_route_plan}
+Database Schema: {database_schema}
 
-Database Schema:
-{database_schema}
+Generate:
+1. FastAPI app with imports (fastapi, uvicorn, pydantic, sqlite3)
+2. Database connection and init using the SQL schema
+3. Pydantic models matching database tables
+4. All endpoints from the route plan with CRUD operations
+5. Error handling (HTTPException)
+6. CORS middleware
+7. Single file: main.py (runnable with uvicorn main:app --reload)
 
-Requirements:
-{requirements}
-
-Please generate a complete FastAPI backend API with:
-1. FastAPI application setup with proper imports (fastapi, uvicorn, pydantic, sqlite3)
-2. Database connection and initialization using the provided SQLite schema and initialization code
-3. Pydantic models for request/response validation based on the database tables
-4. REST API endpoints based on the requirements:
-   - GET endpoints for retrieving data
-   - POST endpoints for creating data
-   - PUT/PATCH endpoints for updating data (if needed)
-   - DELETE endpoints for deleting data (if needed)
-5. Proper error handling with HTTPException
-6. Database CRUD operations using SQLite
-7. CORS middleware configuration
-8. Clear comments and documentation
-9. Follow Python best practices (PEP 8)
-10. Use the provided API route plan to implement all specified endpoints
-11. Use the provided database schema to create appropriate endpoints
-
-Structure the code as a single FastAPI application file that can be run with: uvicorn main:app --reload
-
-IMPORTANT: After the code, also provide a requirements.txt file with all necessary Python dependencies. Format it as:
-
+After the code, include requirements.txt:
 ```txt:requirements.txt
 fastapi>=0.104.0
 uvicorn[standard]>=0.24.0
 pydantic>=2.5.0
-# Add all other dependencies used in the code (e.g., bcrypt, jwt, python-multipart, etc.)
+```
+Add any other dependencies used."""
+
+    FRONTEND_GENERATOR_TEMPLATE = """Generate React JavaScript frontend for this application with CSS styling for these API routes:
+
+Application Description: {application_description}
+
+Api route plan: {api_route_plan}
+
+Create components, API service (fetch), forms, and lists for all routes with modern, clean CSS styling.
+
+Output each file in this format:
+```javascript:src/path/file.jsx
+// code
 ```
 
-Include all packages imported in the code (fastapi, uvicorn, pydantic, sqlite3 is built-in, but add any other third-party packages like bcrypt, python-jose, python-multipart, etc.)
-"""
+Required files:
+1. ```html:public/index.html``` - HTML with root div
+2. ```javascript:src/index.jsx``` - Entry point rendering App (import './App.css')
+3. ```javascript:src/App.jsx``` - Main app component with className attributes (not inline styles)
+4. ```css:src/App.css``` - Modern CSS styling with:
+   - Clean layout (flexbox/grid)
+   - Styled forms (inputs, buttons, labels with padding, borders, focus states)
+   - Navigation bar styling (background, spacing, hover effects)
+   - Card/list styling (borders, shadows, padding, margins)
+   - Responsive design basics (max-width, padding)
+   - Color scheme (use CSS variables for primary/secondary colors)
+   - Button hover effects and transitions
+   - Consistent spacing and typography
+   - Error messages styled in red
+   - Loading states styled appropriately
+5. ```javascript:src/services/api.js``` - Fetch functions for all endpoints
+6. ```javascript:src/components/[ComponentName].jsx``` - Component per route with className attributes
+7. ```json:package.json``` - Dependencies: react, react-dom, react-scripts
 
-    FRONTEND_GENERATOR_TEMPLATE = """Generate React JavaScript frontend for these API routes:
+Style requirements:
+- Use CSS classes (className) not inline styles
+- Modern, professional appearance
+- Consistent spacing and colors
+- Styled buttons, inputs, forms
+- Navigation bar with hover effects
+- Card-based layouts for lists/details
+- Error messages styled in red
+- Loading states styled appropriately
 
-{api_route_plan}
+Use JavaScript (.jsx/.js), not TypeScript."""
 
-Requirements: {requirements}
+    TEST_GENERATOR_TEMPLATE = """Generate pytest test cases for this FastAPI code:
 
-Create:
-- Components for each route
-- API service (fetch)
-- Forms (POST/PUT/PATCH)
-- Lists (GET)
-- Delete (DELETE)
-
-Output Format:
-For each file, use this format:
-```javascript:src/path/to/file.jsx
-// file content here
-```
-
-Required files (MUST include all):
-1. ```html:public/index.html
-   // Main HTML file with root div
-   ```
-
-2. ```javascript:src/index.jsx
-   // Entry point that renders App component
-   ```
-
-3. ```javascript:src/App.jsx
-   // Main app component
-   ```
-
-4. ```javascript:src/services/api.js
-   // API service with fetch functions
-   ```
-
-5. ```javascript:src/components/[ComponentName].jsx
-   // Individual components (one per route)
-   ```
-
-6. ```json:package.json
-   // Dependencies: react, react-dom, react-scripts
-   // Scripts: start, build, test, eject
-   ```
-
-Generate all files in the format above. Each file must be in a separate code block with the file path. Use JavaScript (.jsx, .js), not TypeScript. The public/index.html and src/index.jsx are REQUIRED for the app to run."""
-
-    TEST_GENERATOR_TEMPLATE = """You are an expert in software testing. Based on the following code, generate comprehensive test cases.
-
-Code:
 {code}
 
-Requirements:
-{requirements}
+Create tests covering:
+- Normal operations
+- Edge cases
+- Error handling
+- Boundary conditions
 
-Please generate:
-1. Unit tests using pytest
-2. Test cases covering:
-   - Normal operation
-   - Edge cases
-   - Error handling
-   - Boundary conditions
-3. Test fixtures where needed
-4. Clear test names and documentation
-
-Generate complete, executable test code."""
-
+Use pytest fixtures where needed. Output complete, executable test code."""
 
