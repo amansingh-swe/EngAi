@@ -1,4 +1,9 @@
 """
+Aman singh(67401334)
+Sanmith Kurian (22256557)
+Yash Agarwal (35564877)
+Swapnil Nagras (26761683)
+
 Architect Agent: Analyzes requirements and creates software architecture.
 """
 from typing import Dict, Any
